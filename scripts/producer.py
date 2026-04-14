@@ -1,6 +1,7 @@
 import json
 import time
 import pandas as pd
+import random
 from kafka import KafkaProducer
 
 # ---------------- KAFKA ----------------
@@ -10,17 +11,20 @@ producer = KafkaProducer(
 )
 
 # ---------------- LOAD DATA ----------------
-df = pd.read_csv("data_lake/raw/heart_stream_data.csv")
+df = pd.read_csv("data/heart_stream_data.csv")
 
-print("🚀 Streaming started...")
+# 🔥 shuffle once (random order)
+df = df.sample(frac=1).reset_index(drop=True)
 
+print("🚀 Streaming started ")
 # ---------------- STREAM LOOP ----------------
 for _, row in df.iterrows():
 
     event = row.to_dict()
 
     producer.send("heart-stream", event)
+    producer.flush()
 
-    print("Sent:", event)
+    print("📤 Sent:", event)
 
-    time.sleep(1)   # 🔥 1 event per second
+    time.sleep(1)

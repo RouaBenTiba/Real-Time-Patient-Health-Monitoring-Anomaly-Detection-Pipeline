@@ -12,35 +12,42 @@ consumer = KafkaConsumer(
     group_id='heart-group'
 )
 
-print("👂 Listening heart-stream...")
+# ======================================================
+# ⏳ WAIT FOR PRODUCER
+# ======================================================
+print("⏳ Waiting for producer to start...")
 
-# ---------------- FILE ----------------
-file_name = "heart_stream_output.csv"
-file_exists = os.path.isfile(file_name)
+while True:
+    msg_pack = consumer.poll(timeout_ms=3000)
 
-file = open(file_name, mode='a', newline='')
-writer = csv.DictWriter(file, fieldnames=[
-    "id_patient",
-    "timestamp",
-    "heart_rate",
-    "temperature"
-])
+    if msg_pack:
+        print("🚀 Producer detected, streaming started...")
+        break
+    else:
+        print("...still waiting producer")
 
-# header only once
-if not file_exists:
-    writer.writeheader()
+# ======================================================
+# 📁 FILE INIT
+# ======================================================
+output_file = "data/heart_stream_output.csv"
+file_exists = os.path.isfile(output_file)
 
-# ---------------- STREAM LOOP ----------------
+out_file = open(output_file, mode='a', newline='')
+writer = None
+
+# ======================================================
+# 🚀 STREAM LOOP
+# ======================================================
 for msg in consumer:
     data = msg.value
 
-    print("Received:", data)
+    print("📥 Received:", data)
 
-    writer.writerow({
-        "id_patient": data.get("id_patient"),
-        "timestamp": data.get("timestamp"),
-        "heart_rate": data.get("heart_rate"),
-        "temperature": data.get("temperature")
-    })
+    # 🔥 create header dynamically
+    if writer is None:
+        writer = csv.DictWriter(out_file, fieldnames=data.keys())
+        if not file_exists:
+            writer.writeheader()
 
-    file.flush()
+    writer.writerow(data)
+    out_file.flush()
