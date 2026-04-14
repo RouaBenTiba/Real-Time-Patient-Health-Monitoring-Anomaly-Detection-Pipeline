@@ -5,3 +5,4 @@ python-dotenv==1.0.1
 
 pyspark==4.1.1
 kafka-python==2.0.2
+
