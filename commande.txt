@@ -2,3 +2,9 @@ docker-compose up -d
 Sur PowerShell :
 Test-NetConnection -ComputerName localhost -Port 9092
 docker exec -it kafka kafka-topics --create --topic sales --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+
+
+psql -p 5433 -U postgres
+CREATE DATABASE health_dw;
+\c health_dw
+\dt
