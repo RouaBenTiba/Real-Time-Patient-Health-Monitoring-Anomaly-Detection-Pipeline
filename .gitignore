@@ -1,0 +1,85 @@
+# =========================
+# PYTHON
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# =========================
+# ENV FILES
+# =========================
+.env
+.env.*
+*.env
+
+# =========================
+# SPARK / BIG DATA
+# =========================
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Hadoop / Spark temp files
+*.crc
+._SUCCESS.crc
+
+# =========================
+# POSTGRES / DATABASE
+# =========================
+*.sqlite
+*.db
+
+# Dumps
+*.sql
+*.dump
+
+# =========================
+# LOGS
+# =========================
+*.log
+logs/
+log/
+
+# =========================
+# IDE (VS CODE / PYCHARM)
+# =========================
+.vscode/
+.idea/
+*.iml
+
+# =========================
+# OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# PROJECT OUTPUT (DATA)
+# =========================
+data/*
+data_lake/*
+data/tmp/
+output/
+tmp/
+*.csv
+# =========================
+# JARS (OPTIONNEL)
+# =========================
+# Si tu ne veux pas versionner les drivers JDBC
+jars/*.jar
+
+# =========================
+# TEST / CACHE
+# =========================
+.pytest_cache/
+.mypy_cache/
