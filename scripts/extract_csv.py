@@ -17,8 +17,10 @@ s3 = boto3.client(
 bucket_name = "health-raw"
 
 # dossier local
-LOCAL_DIR = "../data_lake/raw"
-os.makedirs(LOCAL_DIR, exist_ok=True)
+LOCAL_DIR = "/opt/airflow/data_lake/raw"
+
+def ensure_directory():
+    os.makedirs(LOCAL_DIR, exist_ok=True)
 
 # ---------------------------
 # CREATE BUCKET
@@ -51,6 +53,7 @@ def save_local(df, filename):
 # DATASET 1 : DIABETES
 # ---------------------------
 def extract_diabetes():
+    ensure_directory()
     import kagglehub
 
     path = kagglehub.dataset_download(

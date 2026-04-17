@@ -5,8 +5,7 @@ from sqlalchemy import create_engine
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 
-from spark_transformation import heart_dataset_transformation
-from spark_transformation import diabetes_dataset_transformation
+from scripts.spark_transformation import heart_dataset_transformation, diabetes_dataset_transformation
 
 # ----------------------------
 # 1. SPARK SESSION (FIX TIMEZONE)
