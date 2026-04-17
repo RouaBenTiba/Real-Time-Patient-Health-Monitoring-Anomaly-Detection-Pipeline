@@ -27,4 +27,4 @@ for _, row in df.iterrows():
 
     print("📤 Sent:", event)
 
-    time.sleep(1)
+    time.sleep(9)
