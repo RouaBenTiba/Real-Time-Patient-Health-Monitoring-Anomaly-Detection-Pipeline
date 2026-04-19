@@ -1,17 +1,9 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
-import sys
-import os
-
-# IMPORT SCRIPTS
-from scripts.extract_csv import create_bucket, extract_heart, extract_diabetes
 import subprocess
 
-def transform_task():
-    subprocess.run(["python", "/opt/airflow/scripts/spark_transformation.py"])
-from scripts.load_to_datawarehouse import load_to_postgres
-
+from scripts.extract_csv import create_bucket, extract_heart, extract_diabetes
 
 # ----------------------------
 # TASKS
@@ -22,12 +14,10 @@ def extract_task():
     extract_diabetes()
 
 def transform_task():
-    heart_dataset_transformation()
-    diabetes_dataset_transformation()
+    subprocess.run(["python", "/opt/airflow/scripts/spark_transformation.py"])
 
 def load_task():
-    load_to_postgres()
-
+    subprocess.run(["python", "/opt/airflow/scripts/load_to_datawarhouse.py"])
 
 # ----------------------------
 # DAG
