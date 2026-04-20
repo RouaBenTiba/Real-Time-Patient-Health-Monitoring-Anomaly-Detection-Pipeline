@@ -20,3 +20,8 @@ docker exec -it airflow-webserver airflow users create \
   --lastname admin \
   --role Admin \
   --email admin@example.com
+
+
+
+docker compose build
+docker compose up -d

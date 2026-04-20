@@ -20,8 +20,8 @@ spark = SparkSession.builder \
 # ----------------------------
 DB_USER = "postgres"
 DB_PASSWORD = "test"
-DB_HOST = "localhost"
-DB_PORT = "5433"
+DB_HOST = "postgres"
+DB_PORT = "5432"
 DB_NAME = "health_dw"
 
 engine = create_engine(
