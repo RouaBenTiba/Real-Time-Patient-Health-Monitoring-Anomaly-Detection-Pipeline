@@ -1,14 +1,18 @@
 import os
-import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 
-from spark_transformation import heart_dataset_transformation, diabetes_dataset_transformation
+
+from scripts.spark_transformation import (
+    heart_dataset_transformation,
+    diabetes_dataset_transformation
+)
+
 
 # ----------------------------
-# 1. SPARK SESSION (FIX TIMEZONE)
+# 1. SPARK SESSION
 # ----------------------------
 spark = SparkSession.builder \
     .appName("HealthDW") \
@@ -16,12 +20,14 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # ----------------------------
-# 2. POSTGRES CONFIG
+# 2. POSTGRES CONFIG (DOCKER)
 # ----------------------------
 DB_USER = "postgres"
 DB_PASSWORD = "test"
-DB_HOST = "localhost"
-DB_PORT = "5433"
+
+DB_HOST = "postgres"   # IMPORTANT Docker service name
+DB_PORT = "5432"
+
 DB_NAME = "health_dw"
 
 engine = create_engine(
@@ -29,18 +35,16 @@ engine = create_engine(
 )
 
 # ----------------------------
-# 3. SAFE SPARK → PANDAS
+# 3. SPARK → PANDAS SAFE
 # ----------------------------
 def spark_to_pandas(df):
 
-    # 🔥 FIX TIME COLUMN WITHOUT DELETING IT
     if "ingest_date" in df.columns:
         df = df.withColumn(
             "ingest_date",
-            F.to_timestamp("ingest_date")  # convert to Spark timestamp standard
+            F.to_timestamp("ingest_date")
         )
 
-    # 🔥 CAST ALL OTHER DATE/TIME COLUMNS SAFELY
     for c in df.columns:
         if "timestamp" in c or "date" in c:
             df = df.withColumn(c, F.col(c).cast("timestamp"))
@@ -48,10 +52,13 @@ def spark_to_pandas(df):
     return df.toPandas()
 
 # ----------------------------
-# 4. LOAD FUNCTION
+# 4. LOAD FUNCTION (WITH DEBUG)
 # ----------------------------
 def load_to_postgres(pdf, table_name):
-    print(f"🚀 Loading {table_name} into PostgreSQL...")
+
+    print(f"\n🚀 Loading {table_name} into PostgreSQL...")
+
+    print(f"📦 Rows to insert: {len(pdf)}")
 
     pdf.to_sql(
         table_name,
@@ -60,36 +67,42 @@ def load_to_postgres(pdf, table_name):
         index=False
     )
 
-    print(f"✅ {table_name} loaded successfully!")
+    # 🔥 VERIFY INSERT
+    with engine.connect() as conn:
+        count = conn.execute(
+            text(f"SELECT COUNT(*) FROM {table_name}")
+        ).fetchone()[0]
+
+        print(f"📊 Rows in DB after insert ({table_name}): {count}")
+
+    print(f"✅ {table_name} loaded successfully!\n")
 
 # ----------------------------
 # 5. MAIN PIPELINE
 # ----------------------------
 if __name__ == "__main__":
 
-    print("🚀 Starting Data Warehouse Pipeline")
+    print("🚀 Starting Data Warehouse Pipeline\n")
 
-    # Spark transformation
+    # ----------------------------
+    # TRANSFORMATION
+    # ----------------------------
     heart_df = heart_dataset_transformation()
     diabetes_df = diabetes_dataset_transformation()
 
-    # 🔥 KEEP TIME, JUST FIX IT
-    heart_df = heart_df.withColumn(
-        "ingest_date",
-        F.to_timestamp("ingest_date")
-    )
-
-    diabetes_df = diabetes_df.withColumn(
-        "ingest_date",
-        F.to_timestamp("ingest_date")
-    )
-
-    # Convert safely
+    # ----------------------------
+    # CONVERSION
+    # ----------------------------
     heart_pdf = spark_to_pandas(heart_df)
     diabetes_pdf = spark_to_pandas(diabetes_df)
 
-    # Load
+    print("📌 Heart size:", len(heart_pdf))
+    print("📌 Diabetes size:", len(diabetes_pdf))
+
+    # ----------------------------
+    # LOAD
+    # ----------------------------
     load_to_postgres(heart_pdf, "heart_disease")
     load_to_postgres(diabetes_pdf, "diabetes")
 
-    print("🎉 DONE")
+    print("🎉 PIPELINE DONE")
