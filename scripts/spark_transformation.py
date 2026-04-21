@@ -29,8 +29,8 @@ spark = SparkSession.builder \
 
 bucket_name = "health-raw"
 heart_file_name = "heart_disease.csv"
-heart_local_path = "/opt/airflow/data/heart_disease.csv"
-diabetes_local_path = "/opt/airflow/data/diabetes.csv"
+heart_local_path = "data/heart_disease.csv"
+diabetes_local_path = "data/diabetes.csv"
 
 diabetes_file_name = "diabetes.csv"
 

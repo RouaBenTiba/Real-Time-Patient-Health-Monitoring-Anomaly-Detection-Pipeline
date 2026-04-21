@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 
-from scripts.spark_transformation import heart_dataset_transformation, diabetes_dataset_transformation
+from spark_transformation import heart_dataset_transformation, diabetes_dataset_transformation
 
 # ----------------------------
 # 1. SPARK SESSION (FIX TIMEZONE)
@@ -20,8 +20,8 @@ spark = SparkSession.builder \
 # ----------------------------
 DB_USER = "postgres"
 DB_PASSWORD = "test"
-DB_HOST = "postgres"
-DB_PORT = "5432"
+DB_HOST = "localhost"
+DB_PORT = "5433"
 DB_NAME = "health_dw"
 
 engine = create_engine(
