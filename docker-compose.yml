@@ -35,7 +35,7 @@ services:
   # POSTGRES (DATA WAREHOUSE)
   # ----------------------------
   postgres:
-    image: postgres:14
+    image: postgres:15
     container_name: postgres
     networks:
       - airflow-net
